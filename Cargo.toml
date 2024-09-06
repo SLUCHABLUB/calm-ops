@@ -1,0 +1,5 @@
+[package]
+name = "calm-ops"
+version = "0.1.0"
+authors = ["SLUCHABLUB"]
+edition = "2021"
