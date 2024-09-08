@@ -29,18 +29,13 @@ pub(crate) fn implementation(
     method_prefix: &str,
     supported_trait_suffixes: &[&str],
 ) -> TokenStream {
-    let expression = convert_expression(
+    convert_expression(
         &expression,
         trait_prefix,
         method_prefix,
         supported_trait_suffixes,
     )
-    .unwrap_or_else(|error| Error::new(expression.span(), error).to_compile_error());
-
-    quote!({
-        extern crate self as calm_ops;
-        #expression
-    })
+    .unwrap_or_else(|error| Error::new(expression.span(), error).to_compile_error())
 }
 
 fn convert_expression(
