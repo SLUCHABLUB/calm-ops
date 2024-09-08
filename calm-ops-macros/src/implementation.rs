@@ -1,6 +1,6 @@
 use anyhow::{anyhow, bail, ensure, Result};
 use proc_macro2::TokenStream;
-use quote::quote;
+use quote::{format_ident, quote};
 use syn::spanned::Spanned;
 use syn::{BinOp, Error, Expr, ExprBinary, ExprCast, ExprUnary, UnOp};
 
@@ -86,8 +86,8 @@ fn convert_expression(
         bail!("Unsupported operation")
     }
 
-    let trait_name = format!("{trait_prefix}{trait_suffix}");
-    let method_name = format!("{method_prefix}_{method_suffix}");
+    let trait_name = format_ident!("{trait_prefix}{trait_suffix}");
+    let method_name = format_ident!("{method_prefix}_{method_suffix}");
 
     Ok(quote! {
         calm_ops::#trait_name::<#(#generic)?>::#method_name(#(#arguments),*)
