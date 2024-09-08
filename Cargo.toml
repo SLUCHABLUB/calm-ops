@@ -3,3 +3,13 @@ name = "calm-ops"
 version = "0.1.0"
 authors = ["SLUCHABLUB"]
 edition = "2021"
+
+[dependencies]
+num = "0.4.3"
+paste = "1.0.15"
+# TODO: Change to normal dependency
+calm-ops-macros = { path = "calm-ops-macros" }
+
+[features]
+i128 = []
+big-int = ["i128"]
