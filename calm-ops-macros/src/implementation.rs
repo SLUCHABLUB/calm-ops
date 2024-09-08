@@ -90,6 +90,6 @@ fn convert_expression(
     let method_name = format_ident!("{method_prefix}_{method_suffix}");
 
     Ok(quote! {
-        calm_ops::#trait_name::<#(#generic)?>::#method_name(#(#arguments),*)
+        calm_ops::#trait_name::<#generic>::#method_name(#(#arguments),*)
     })
 }
