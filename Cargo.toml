@@ -2,7 +2,7 @@
 name = "calm-ops"
 version = "0.1.0"
 authors = ["SLUCHABLUB"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 num = "0.4.3"
