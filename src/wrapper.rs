@@ -1,5 +1,3 @@
-use std::ops::Neg;
-
 macro_rules! define {
     (impl $trait_name:ident) => {
         impl<T: num::traits::$trait_name> $trait_name for T {}
@@ -47,10 +45,11 @@ define!(SaturatingAdd, saturating_add);
 define!(SaturatingMul, saturating_mul);
 define!(SaturatingSub, saturating_sub);
 
-pub trait SaturatingNeg: Neg<Output = Self> {
+pub trait SaturatingNeg: CheckedNeg {
     fn saturating_neg(self) -> Self;
 }
 
+// This implementation only works for 2's complement based .
 macro_rules! impl_saturating_neg {
     ($ty:ty) => {
         impl SaturatingNeg for $ty {
