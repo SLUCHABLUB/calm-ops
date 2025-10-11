@@ -1,6 +1,6 @@
-use std::ops::{Add, Mul, Neg, Sub};
 use num::Integer;
 use num::rational::Ratio;
+use std::ops::{Add, Mul, Neg, Sub};
 
 /// Used for types that can be encapsulated in a "larger" type.
 /// Any operations[^operations] that may panic due to overflow may not panic
@@ -77,7 +77,6 @@ where
         -self.encapsulate()
     }
 }
-
 
 macro_rules! impl_unsigned {
     ($sub:ty: $sup:ty) => {

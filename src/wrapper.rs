@@ -41,6 +41,19 @@ pub trait CheckedNeg: num::traits::CheckedNeg {
 
 impl<T: num::traits::CheckedNeg> CheckedNeg for T {}
 
+pub trait CheckedCast<Target>: TryInto<Target> {
+    fn checked_cast(self) -> Option<Target>;
+}
+
+impl<Source, Target> CheckedCast<Target> for Source
+where
+    Source: TryInto<Target>,
+{
+    fn checked_cast(self) -> Option<Target> {
+        self.try_into().ok()
+    }
+}
+
 define!(SaturatingAdd, saturating_add);
 define!(SaturatingMul, saturating_mul);
 define!(SaturatingSub, saturating_sub);
@@ -67,6 +80,62 @@ impl_saturating_neg!(i32);
 impl_saturating_neg!(i64);
 impl_saturating_neg!(i128);
 impl_saturating_neg!(isize);
+
+pub trait SaturatingCast<Target> {
+    fn saturating_cast(self) -> Target;
+}
+
+macro_rules! implement_saturating_cast {
+    ($source:ty) => {
+        implement_saturating_cast!($source as u8);
+        implement_saturating_cast!($source as u16);
+        implement_saturating_cast!($source as u32);
+        implement_saturating_cast!($source as u64);
+        implement_saturating_cast!($source as u128);
+        implement_saturating_cast!($source as usize);
+
+        implement_saturating_cast!($source as i8);
+        implement_saturating_cast!($source as i16);
+        implement_saturating_cast!($source as i32);
+        implement_saturating_cast!($source as i64);
+        implement_saturating_cast!($source as i128);
+        implement_saturating_cast!($source as isize);
+    };
+    ($source:ty as $target:ty) => {
+        impl SaturatingCast<$target> for $source {
+            fn saturating_cast(self) -> $target {
+                #![allow(unused_comparisons)]
+
+                if <$source>::MIN == 0 {
+                    //  Converting `MIN` will never fail.
+                    return self.checked_cast().unwrap_or(<$target>::MAX);
+                }
+
+                let saturation_point = if self < 0 {
+                    <$target>::MIN
+                } else {
+                    <$target>::MAX
+                };
+
+                self.checked_cast().unwrap_or(saturation_point)
+            }
+        }
+    };
+}
+
+implement_saturating_cast!(u8);
+implement_saturating_cast!(u16);
+implement_saturating_cast!(u32);
+implement_saturating_cast!(u64);
+implement_saturating_cast!(u128);
+implement_saturating_cast!(usize);
+
+implement_saturating_cast!(i8);
+implement_saturating_cast!(i16);
+implement_saturating_cast!(i32);
+implement_saturating_cast!(i64);
+implement_saturating_cast!(i128);
+implement_saturating_cast!(isize);
 
 define!(WrappingAdd, wrapping_add);
 define!(WrappingMul, wrapping_mul);
