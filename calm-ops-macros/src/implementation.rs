@@ -84,6 +84,7 @@ fn convert_expression(
     let trait_name = format_ident!("{trait_prefix}{trait_suffix}");
     let method_name = format_ident!("{method_prefix}_{method_suffix}");
 
+    // TODO: use $crate
     Ok(quote! {
         calm_ops::#trait_name::<#generic>::#method_name(#(#arguments),*)
     })

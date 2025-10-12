@@ -109,14 +109,10 @@ impl_signed!(i8: i16);
 impl_signed!(i16: i32);
 impl_signed!(i32: i64);
 
-#[cfg(feature = "i128")]
 impl_unsigned!(u64: u128);
-#[cfg(feature = "i128")]
 impl_signed!(i64: i128);
 
-#[cfg(feature = "big-int")]
 impl_unsigned!(u128: num::BigUint);
-#[cfg(feature = "big-int")]
 impl_signed!(i128: num::BigInt);
 
 impl<T: Encapsulate + Clone + Integer> Encapsulate for Ratio<T>

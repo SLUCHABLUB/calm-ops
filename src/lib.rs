@@ -6,3 +6,6 @@ mod wrapper;
 pub use calm_ops_macros::*;
 pub use encapsulating::*;
 pub use wrapper::*;
+
+#[cfg(test)]
+mod test;
