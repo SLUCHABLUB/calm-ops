@@ -70,10 +70,12 @@ test!(checked div /);
 test!(checked mul *);
 test!(checked rem %);
 test!(checked sub -);
-test!(checked neg);
+test!(checked neg);//TODO: test!(saturating neg);
 
 test!(checked shl << : shift);
 test!(checked shr >> : shift);
+
+//TODO: test!(checked cast);
 
 // TODO: Test encapsulating operations.
 
@@ -81,6 +83,8 @@ test!(saturating add +);
 test!(saturating mul *);
 test!(saturating sub -);
 //TODO: test!(saturating neg);
+
+//TODO: test!(saturating cast);
 
 test!(wrapping add +);
 test!(wrapping mul *);
