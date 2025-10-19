@@ -103,8 +103,6 @@ macro_rules! helper {
 
     // --- PARAMETER DEFAULTS ---
 
-    // TODO: do these for impl too
-
     // Default rhs's type to `Self`
     ($(#[$meta:ident])? trait $trait_name:ident fn $method:ident $(-> $return_type:ty)? $(= $function:expr)?) => {
         helper!($(#[$meta])? trait $trait_name fn $method (Self) $(-> $return_type)? $(= $function)?);
@@ -131,7 +129,7 @@ pub trait CheckedCast<Target> {
 
 impl<Source, Target> CheckedCast<Target> for Source
 where
-    Source: TryInto<Target>,
+    Source: TryInto<Target> + Primitive,
 {
     fn checked_cast(self) -> Option<Target> {
         self.try_into().ok()
@@ -144,7 +142,6 @@ helper!(#[assign] trait SaturatingSub fn saturating_sub = Self::saturating_sub);
 
 helper!(trait SaturatingNeg fn saturating_neg ());
 
-// TODO: remove `-> Self`
 helper!(impl SaturatingNeg for i* fn saturating_neg () -> Self = |this| this.checked_neg().unwrap_or(Self::MAX));
 helper!(impl SaturatingNeg for u* fn saturating_neg () -> Self = |_| 0);
 
