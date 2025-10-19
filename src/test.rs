@@ -70,7 +70,7 @@ test!(checked div /);
 test!(checked mul *);
 test!(checked rem %);
 test!(checked sub -);
-test!(checked neg);//TODO: test!(saturating neg);
+test!(checked neg);
 
 test!(checked shl << : shift);
 test!(checked shr >> : shift);

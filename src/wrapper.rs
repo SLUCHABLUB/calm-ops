@@ -1,47 +1,131 @@
+// TODO: make num create a feature
+// TODO: implement for floats
+
+use paste::paste;
+
+trait Primitive: Copy {}
+
+impl Primitive for f32 {}
+impl Primitive for f64 {}
+
+impl Primitive for i8 {}
+impl Primitive for i16 {}
+impl Primitive for i32 {}
+impl Primitive for i64 {}
+impl Primitive for i128 {}
+impl Primitive for isize {}
+
+impl Primitive for u8 {}
+impl Primitive for u16 {}
+impl Primitive for u32 {}
+impl Primitive for u64 {}
+impl Primitive for u128 {}
+impl Primitive for usize {}
+
 macro_rules! define {
-    (impl $trait_name:ident) => {
-        impl<T: num::traits::$trait_name> $trait_name for T {}
-    };
-    ($trait_name:ident, $method:ident -> $return_type:ty) => {
-        pub trait $trait_name: num::traits::$trait_name {
-            fn $method(self, rhs: Self) -> $return_type {
-                num::traits::$trait_name::$method(&self, &rhs)
+    // --- TRAIT IMPLEMENTATION ---
+
+    (impl $trait_name:ident for $type:ident fn $method:ident ($($rhs_type:ty)?) -> $return_type:ty = $function:expr) => {
+        impl $trait_name for $type {
+            fn $method(self, $(rhs: $rhs_type)?) -> $return_type {
+                let function: fn(Self, $($rhs_type)?) -> $return_type = $function;
+
+                function(self, $(rhs as $rhs_type)?)
             }
         }
-
-        define!(impl $trait_name);
     };
-    ($trait_name:ident, $method:ident -> $return_type:ty : shift) => {
-        pub trait $trait_name: num::traits::$trait_name {
-            fn $method(self, rhs: u32) -> $return_type {
-                num::traits::$trait_name::$method(&self, rhs)
+
+    // --- NULL IMPLEMENTATION ---
+
+    (
+        impl $trait_name:ident
+            fn $method:ident ($($rhs_type:ty)?) -> $return_type:ty
+    ) => {};
+
+    // --- IMPLEMENTATIONS FOR MULTIPLE TYPES ---
+
+    (
+        impl $trait_name:ident for i*
+            fn $method:ident ($($rhs_type:ty)?) -> $return_type:ty = $function:expr
+    ) => {
+        define!(impl $trait_name for i8    fn $method ($($rhs_type)?) -> $return_type = $function);
+        define!(impl $trait_name for i16   fn $method ($($rhs_type)?) -> $return_type = $function);
+        define!(impl $trait_name for i32   fn $method ($($rhs_type)?) -> $return_type = $function);
+        define!(impl $trait_name for i64   fn $method ($($rhs_type)?) -> $return_type = $function);
+        define!(impl $trait_name for i128  fn $method ($($rhs_type)?) -> $return_type = $function);
+        define!(impl $trait_name for isize fn $method ($($rhs_type)?) -> $return_type = $function);
+    };
+    (
+        impl $trait_name:ident for u*
+            fn $method:ident ($($rhs_type:ty)?) -> $return_type:ty = $function:expr
+    ) => {
+        define!(impl $trait_name for u8    fn $method ($($rhs_type)?) -> $return_type = $function);
+        define!(impl $trait_name for u16   fn $method ($($rhs_type)?) -> $return_type = $function);
+        define!(impl $trait_name for u32   fn $method ($($rhs_type)?) -> $return_type = $function);
+        define!(impl $trait_name for u64   fn $method ($($rhs_type)?) -> $return_type = $function);
+        define!(impl $trait_name for u128  fn $method ($($rhs_type)?) -> $return_type = $function);
+        define!(impl $trait_name for usize fn $method ($($rhs_type)?) -> $return_type = $function);
+    };
+    (
+        impl $trait_name:ident
+            fn $method:ident ($($rhs_type:ty)?) -> $return_type:ty = $function:expr
+    ) => {
+        define!(impl $trait_name for i* fn $method ($($rhs_type)?) -> $return_type = $function);
+        define!(impl $trait_name for u* fn $method ($($rhs_type)?) -> $return_type = $function);
+    };
+
+    // --- TRAIT DEFINING RULES ---
+
+    // Assignment trait
+    (#[assign] trait $trait_name:ident fn $method:ident ($rhs_type:ty) -> Self $(= $function:expr)?) => {
+        define!(trait $trait_name fn $method ($rhs_type) -> Self $(= $function)?);
+
+        paste! {
+            pub trait [<$trait_name Assign>] {
+                fn [<$method _assign>](&mut self, rhs: $rhs_type);
+            }
+
+            impl<T: $trait_name + Primitive> [<$trait_name Assign>] for T {
+                fn [<$method _assign>](&mut self, rhs: $rhs_type) {
+                    *self = self.$method(rhs);
+                }
             }
         }
-
-        define!(impl $trait_name);
     };
-    ($trait_name:ident, $method:ident $(: $shift:tt)?) => {
-        define!($trait_name, $method -> Self $(: $shift)?);
-    }
+    // "Normal" trait
+    (trait $trait_name:ident fn $method:ident ($($rhs_type:ty)?) -> $return_type:ty $(= $function:expr)?) => {
+        pub trait $trait_name: Sized {
+            fn $method(self, $(rhs: $rhs_type)?) -> $return_type;
+        }
+
+        define!(impl $trait_name fn $method ($($rhs_type)?) -> $return_type $(= $function)?);
+    };
+
+    // --- PARAMETER DEFAULTS ---
+
+    // TODO: do these for impl too
+
+    // Default rhs's type to `Self`
+    ($(#[$meta:ident])? trait $trait_name:ident fn $method:ident $(-> $return_type:ty)? $(= $function:expr)?) => {
+        define!($(#[$meta])? trait $trait_name fn $method (Self) $(-> $return_type)? $(= $function)?);
+    };
+    // Default return type to `Self`
+    ($(#[$meta:ident])? trait $trait_name:ident fn $method:ident ($($rhs_type:ty)?) $(= $function:expr)?) => {
+        define!($(#[$meta])? trait $trait_name fn $method ($($rhs_type)?) -> Self $(= $function)?);
+    };
 }
 
-define!(CheckedAdd, checked_add -> Option<Self>);
-define!(CheckedDiv, checked_div -> Option<Self>);
-define!(CheckedMul, checked_mul -> Option<Self>);
-define!(CheckedRem, checked_rem -> Option<Self>);
-define!(CheckedShl, checked_shl -> Option<Self> : shift);
-define!(CheckedShr, checked_shr -> Option<Self> : shift);
-define!(CheckedSub, checked_sub -> Option<Self>);
+define!(trait CheckedAdd fn checked_add       -> Option<Self> = Self::checked_add);
+define!(trait CheckedDiv fn checked_div       -> Option<Self> = Self::checked_div);
+define!(trait CheckedMul fn checked_mul       -> Option<Self> = Self::checked_mul);
+define!(trait CheckedRem fn checked_rem       -> Option<Self> = Self::checked_rem);
+define!(trait CheckedShl fn checked_shl (u32) -> Option<Self> = Self::checked_shl);
+define!(trait CheckedShr fn checked_shr (u32) -> Option<Self> = Self::checked_shr);
+define!(trait CheckedSub fn checked_sub       -> Option<Self> = Self::checked_sub);
 
-pub trait CheckedNeg: num::traits::CheckedNeg {
-    fn checked_neg(self) -> Option<Self> {
-        num::traits::CheckedNeg::checked_neg(&self)
-    }
-}
+define!(trait CheckedNeg fn checked_neg () -> Option<Self> = Self::checked_neg);
 
-impl<T: num::traits::CheckedNeg> CheckedNeg for T {}
-
-pub trait CheckedCast<Target>: TryInto<Target> {
+pub trait CheckedCast<Target> {
     fn checked_cast(self) -> Option<Target>;
 }
 
@@ -54,37 +138,21 @@ where
     }
 }
 
-define!(SaturatingAdd, saturating_add);
-define!(SaturatingMul, saturating_mul);
-define!(SaturatingSub, saturating_sub);
+define!(#[assign] trait SaturatingAdd fn saturating_add = Self::saturating_add);
+define!(#[assign] trait SaturatingMul fn saturating_mul = Self::saturating_mul);
+define!(#[assign] trait SaturatingSub fn saturating_sub = Self::saturating_sub);
 
-pub trait SaturatingNeg: CheckedNeg {
-    fn saturating_neg(self) -> Self;
-}
+define!(trait SaturatingNeg fn saturating_neg ());
 
-// This implementation only works for 2's complement based .
-macro_rules! impl_saturating_neg {
-    ($ty:ty) => {
-        impl SaturatingNeg for $ty {
-            fn saturating_neg(self) -> Self {
-                // `checked_neg` only fails `self` is `Self::MIN`, in which case we saturate to `Self::MAX`
-                self.checked_neg().unwrap_or(Self::MAX)
-            }
-        }
-    };
-}
-
-impl_saturating_neg!(i8);
-impl_saturating_neg!(i16);
-impl_saturating_neg!(i32);
-impl_saturating_neg!(i64);
-impl_saturating_neg!(i128);
-impl_saturating_neg!(isize);
+// TODO: remove `-> Self`
+define!(impl SaturatingNeg for i* fn saturating_neg () -> Self = |this| this.checked_neg().unwrap_or(Self::MAX));
+define!(impl SaturatingNeg for u* fn saturating_neg () -> Self = |_| 0);
 
 pub trait SaturatingCast<Target> {
     fn saturating_cast(self) -> Target;
 }
 
+// TODO: add generics support to the macro
 macro_rules! implement_saturating_cast {
     ($source:ty) => {
         implement_saturating_cast!($source as u8);
@@ -137,17 +205,11 @@ implement_saturating_cast!(i64);
 implement_saturating_cast!(i128);
 implement_saturating_cast!(isize);
 
-define!(WrappingAdd, wrapping_add);
-define!(WrappingMul, wrapping_mul);
-define!(WrappingSub, wrapping_sub);
+define!(#[assign] trait WrappingAdd fn wrapping_add = Self::wrapping_add);
+define!(#[assign] trait WrappingMul fn wrapping_mul = Self::wrapping_mul);
+define!(#[assign] trait WrappingSub fn wrapping_sub = Self::wrapping_sub);
 
-define!(WrappingShl, wrapping_shl : shift);
-define!(WrappingShr, wrapping_shr : shift);
+define!(#[assign] trait WrappingShl fn wrapping_shl (u32) = Self::wrapping_shl);
+define!(#[assign] trait WrappingShr fn wrapping_shr (u32) = Self::wrapping_shr);
 
-pub trait WrappingNeg: num::traits::WrappingNeg {
-    fn wrapping_neg(self) -> Self {
-        num::traits::WrappingNeg::wrapping_neg(&self)
-    }
-}
-
-impl<T: num::traits::WrappingNeg> WrappingNeg for T {}
+define!(trait WrappingNeg fn wrapping_neg () = Self::wrapping_neg);

@@ -11,13 +11,18 @@ fn trait_method_suffix(operation: &BinOp) -> Option<(&'static str, &'static str)
         BinOp::Mul(_) => ("Mul", "mul"),
         BinOp::Div(_) => ("Div", "div"),
         BinOp::Rem(_) => ("Rem", "rem"),
-        BinOp::BitXor(_) => ("BitXor", "bitor"),
-        BinOp::BitAnd(_) => ("BitAnd", "bitand"),
-        BinOp::BitOr(_) => ("BitOr", "bitor"),
         BinOp::Shl(_) => ("Shl", "shl"),
         BinOp::Shr(_) => ("Shr", "shr"),
 
-        _ => return None,
+        BinOp::AddAssign(_) => ("AddAssign", "add_assign"),
+        BinOp::SubAssign(_) => ("SubAssign", "sub_assign"),
+        BinOp::MulAssign(_) => ("MulAssign", "mul_assign"),
+        BinOp::DivAssign(_) => ("DivAssign", "div_assign"),
+        BinOp::RemAssign(_) => ("RemAssign", "rem_assign"),
+        BinOp::ShlAssign(_) => ("ShlAssign", "shl_assign"),
+        BinOp::ShrAssign(_) => ("ShrAssign", "shr_assign"),
+
+        _ => todo!(),
     })
 }
 
