@@ -1,6 +1,6 @@
 use anyhow::{anyhow, bail, ensure, Result};
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote};
+use quote::{format_ident, quote, ToTokens};
 use syn::spanned::Spanned;
 use syn::{BinOp, Error, Expr, ExprBinary, ExprCast, ExprUnary, UnOp};
 
@@ -26,19 +26,15 @@ fn trait_method_suffix(operation: &BinOp) -> Option<(&'static str, &'static str)
     })
 }
 
-const UNSUPPORTED_OPERATION: &str = "Unsupported operation";
-
 pub(crate) fn implementation(
     expression: Expr,
     trait_prefix: &str,
     method_prefix: &str,
-    supported_trait_suffixes: &[&str],
 ) -> TokenStream {
     convert_expression(
         &expression,
         trait_prefix,
         method_prefix,
-        supported_trait_suffixes,
     )
     .unwrap_or_else(|error| Error::new(expression.span(), error).to_compile_error())
 }
@@ -47,7 +43,6 @@ fn convert_expression(
     expression: &Expr,
     trait_prefix: &str,
     method_prefix: &str,
-    supported_trait_suffixes: &[&str],
 ) -> Result<TokenStream> {
     // TODO: recurse
     let arguments: Vec<&Expr>;
@@ -63,7 +58,7 @@ fn convert_expression(
         }) => {
             arguments = vec![left, right];
             (trait_suffix, method_suffix) =
-                trait_method_suffix(op).ok_or(anyhow!(UNSUPPORTED_OPERATION))?;
+                trait_method_suffix(op).ok_or(anyhow!("unsupported operator: `{}`", op.into_token_stream()))?;
             generic = None;
         }
         Expr::Cast(ExprCast { expr, ty, .. }) => {
@@ -74,17 +69,13 @@ fn convert_expression(
         }
         Expr::Unary(ExprUnary { op, expr, .. }) => {
             arguments = vec![expr];
-            ensure!(matches!(op, UnOp::Neg(_)), UNSUPPORTED_OPERATION);
+            ensure!(matches!(op, UnOp::Neg(_)), "unsupported unary operator: `{}`", op.into_token_stream());
             trait_suffix = "Neg";
             method_suffix = "neg";
             generic = None;
         }
-        _ => bail!(UNSUPPORTED_OPERATION),
+        _ => bail!("expected an operation or a cast"),
     };
-
-    if !supported_trait_suffixes.contains(&trait_suffix) {
-        bail!("Unsupported operation")
-    }
 
     let trait_name = format_ident!("{trait_prefix}{trait_suffix}");
     let method_name = format_ident!("{method_prefix}_{method_suffix}");
