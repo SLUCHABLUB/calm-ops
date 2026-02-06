@@ -31,7 +31,7 @@ macro_rules! test {
         test!($type $prefix $suffix $operator u32);
     };
 
-    // Heterogenous binary operations.
+    // Heterogeneous binary operations.
     ($type:ident $prefix:ident $suffix:ident $operator:tt $operand:ident) => {
         paste! {
             #[property_test]
