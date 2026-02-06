@@ -1,4 +1,4 @@
-#![deny(clippy::all)]
+#![deny(clippy::pedantic)]
 
 use crate::implementation::implementation;
 use proc_macro::TokenStream;

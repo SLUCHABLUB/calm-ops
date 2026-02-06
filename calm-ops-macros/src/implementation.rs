@@ -146,7 +146,7 @@ fn convert_expression(
             generic = None;
         }
         _ => bail!("expected an operation or a cast"),
-    };
+    }
 
     let trait_name = format_ident!("{trait_prefix}{}", operator.trait_suffix);
     let method_name = format_ident!("{method_prefix}_{}", operator.method_suffix);

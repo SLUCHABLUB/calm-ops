@@ -95,6 +95,7 @@ macro_rules! helper {
     // "Normal" trait
     (trait $trait_name:ident fn $method:ident ($($rhs_type:ty)?) -> $return_type:ty $(= $function:expr)?) => {
         pub trait $trait_name: Sized {
+            #[must_use]
             fn $method(self, $(rhs: $rhs_type)?) -> $return_type;
         }
 

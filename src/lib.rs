@@ -1,4 +1,4 @@
-#![deny(clippy::all, clippy::arithmetic_side_effects)]
+#![deny(clippy::pedantic, clippy::arithmetic_side_effects)]
 
 mod encapsulating;
 mod wrapper;
