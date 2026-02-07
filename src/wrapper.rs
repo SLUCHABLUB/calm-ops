@@ -140,6 +140,7 @@ where
 helper!(#[assign] trait SaturatingAdd fn saturating_add = Self::saturating_add);
 helper!(#[assign] trait SaturatingMul fn saturating_mul = Self::saturating_mul);
 helper!(#[assign] trait SaturatingSub fn saturating_sub = Self::saturating_sub);
+// TODO: Div && Rem
 
 helper!(trait SaturatingNeg fn saturating_neg ());
 
@@ -206,8 +207,10 @@ implement_saturating_cast!(isize);
 helper!(#[assign] trait WrappingAdd fn wrapping_add = Self::wrapping_add);
 helper!(#[assign] trait WrappingMul fn wrapping_mul = Self::wrapping_mul);
 helper!(#[assign] trait WrappingSub fn wrapping_sub = Self::wrapping_sub);
+// TODO: Div && Rem
 
 helper!(#[assign] trait WrappingShl fn wrapping_shl (u32) = Self::wrapping_shl);
 helper!(#[assign] trait WrappingShr fn wrapping_shr (u32) = Self::wrapping_shr);
 
 helper!(trait WrappingNeg fn wrapping_neg () = Self::wrapping_neg);
+// TODO: Cast
