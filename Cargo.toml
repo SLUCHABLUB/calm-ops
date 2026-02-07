@@ -1,17 +1,26 @@
 [workspace]
 members = ["macros"]
 
-[package]
-name = "calm-ops"
+[workspace.package]
 version = "0.1.0"
 authors = ["SLUCHABLUB"]
 edition = "2024"
 
-[dependencies]
-num = "0.4.3"
-paste = "1.0.15"
-
+[workspace.dependencies]
+calm-ops        = { path = "."      }
 calm-ops-macros = { path = "macros" }
+calm-ops-traits = { path = "traits" }
+
+[package]
+name = "calm-ops"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+calm-ops-macros = { workspace = true }
+calm-ops-traits = { workspace = true }
 
 [dev-dependencies]
+paste = "1.0.15"
 proptest = { version = "1.8.0", features = [ "attr-macro" ] }

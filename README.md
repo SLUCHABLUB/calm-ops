@@ -25,7 +25,7 @@ checked!(127_i8 + 1_i8) == None
 encapsulating!(127_i8 + 1_i8) == 128_i16
 ```
 
-They all take a binary expression and evaluates it using the specified sematic.
+They all take an operation expression and evaluates it using the specified sematic.
 I personally find this more readable than inventing new operators.
 This is however done in a shallow manner. Therefore,
 
@@ -34,5 +34,15 @@ wrapping!((127_i8 + 1_i8) + 1_i8) != -127_i8
 ```
 
 Will still panic.
+
+Casting is also supported.
+
+```rust
+wrapping!(255_u8 as i8) == -1_i8
+
+saturating!(255_u8 as i8) == 127_i8
+
+checked!(255_u8 as i8) == None
+```
 
 <!-- cargo-rdme end -->

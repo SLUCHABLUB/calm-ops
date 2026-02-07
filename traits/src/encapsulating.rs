@@ -35,7 +35,7 @@ use std::ops::{Add, Mul, Neg, Sub};
 /// assert_eq!(c, d);
 /// ```
 ///
-/// [^operations]: addition, subtraction, multiplication, and negation
+/// [^operations]: addition, subtraction, multiplication, division, modulo, and negation
 pub trait Encapsulate: Sized {
     type Super;
 
@@ -78,6 +78,7 @@ where
     }
 }
 
+// TODO: use the trait macros
 macro_rules! impl_unsigned {
     ($sub:ty: $sup:ty) => {
         impl Encapsulate for $sub {

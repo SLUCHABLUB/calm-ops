@@ -1,0 +1,12 @@
+[package]
+name = "calm-ops-traits"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+num = "0.4.3"
+paste = "1.0.15"
+
+[dev-dependencies]
+calm-ops = { workspace = true }

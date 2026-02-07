@@ -26,10 +26,6 @@ macro_rules! test {
     ($type:ident $prefix:ident $suffix:ident $operator:tt) => {
         test!($type $prefix $suffix $operator $type);
     };
-    // Shift operations.
-    ($type:ident $prefix:ident $suffix:ident $operator:tt : shift) => {
-        test!($type $prefix $suffix $operator u32);
-    };
 
     // Heterogeneous binary operations.
     ($type:ident $prefix:ident $suffix:ident $operator:tt $operand:ident) => {
@@ -72,8 +68,8 @@ test!(checked rem %);
 test!(checked sub -);
 test!(checked neg);
 
-test!(checked shl << : shift);
-test!(checked shr >> : shift);
+test!(checked shl << u32);
+test!(checked shr >> u32);
 
 //TODO: test!(checked cast);
 
@@ -91,5 +87,5 @@ test!(wrapping mul *);
 test!(wrapping sub -);
 test!(wrapping neg);
 
-test!(wrapping shl << : shift);
-test!(wrapping shr >> : shift);
+test!(wrapping shl << u32);
+test!(wrapping shr >> u32);

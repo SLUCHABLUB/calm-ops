@@ -33,7 +33,7 @@
 //! # );
 //! ```
 //!
-//! They all take a binary expression and evaluates it using the specified sematic.
+//! They all take an operation expression and evaluates it using the specified sematic.
 //! I personally find this more readable than inventing new operators.
 //! This is however done in a shallow manner. Therefore,
 //!
@@ -45,9 +45,25 @@
 //! ```
 //!
 //! Will still panic.
+//!
+//! Casting is also supported.
+//!
+//! ```
+//! # use calm_ops::*;
+//! # assert!(
+//! wrapping!(255_u8 as i8) == -1_i8
+//! # );
+//!
+//! # assert!(
+//! saturating!(255_u8 as i8) == 127_i8
+//! # );
+//!
+//! # assert!(
+//! checked!(255_u8 as i8) == None
+//! # );
+//! ```
 
-mod encapsulating;
-mod wrapper;
+// TODO: Move the macro docs to the macro crate.
 
 /// Evaluates a binary operation using checked overflow semantics.
 ///
@@ -293,8 +309,7 @@ pub use calm_ops_macros::saturating;
 /// ```
 pub use calm_ops_macros::wrapping;
 
-pub use encapsulating::*;
-pub use wrapper::*;
+pub use calm_ops_traits::*;
 
 #[cfg(test)]
 mod test;
