@@ -129,6 +129,7 @@ macro_rules! implement_shift_assign_trait {
         }
     };
 }
+
 macro_rules! for_signed {
     (type $T:ident; $($tt:tt)+) => {
         mod __for_signed_i8    { use super::*; type $T = i8;    $($tt)+ }

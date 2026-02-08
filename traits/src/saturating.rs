@@ -1,6 +1,7 @@
 use crate::macros::{
     define_assign_trait, define_shift_trait, define_trait, for_float, for_primitive, for_signed,
-    for_signed_and_unsigned, for_unsigned, implement_assign_trait, implement_trait,
+    for_signed_and_unsigned, for_unsigned, implement_assign_trait, implement_division_trait,
+    implement_trait,
 };
 use std::num::NonZero;
 
@@ -33,18 +34,6 @@ define_assign_trait!(SaturatingSubAssign, saturating_sub_assign);
 
 // TODO: Add shift assign operators if we add shift operators.
 
-for_signed! {
-    type T;
-
-    impl SaturatingNeg for T {
-        type Output = T;
-
-        fn saturating_neg(self) -> T {
-            self.saturating_neg()
-        }
-    }
-}
-
 for_signed_and_unsigned! {
     type T;
 
@@ -52,14 +41,7 @@ for_signed_and_unsigned! {
     implement_trait!(SaturatingMul, saturating_mul, T);
     implement_trait!(SaturatingSub, saturating_sub, T);
 
-    impl SaturatingDiv<NonZero<T>> for T {
-        type Output = T;
-
-        fn saturating_div(self, rhs: NonZero<T>) -> T {
-            #![allow(clippy::arithmetic_side_effects, reason = "false positive: rhs is non-zero")]
-            self.saturating_div(rhs.get())
-        }
-    }
+    implement_division_trait!(SaturatingDiv, saturating_div, T);
 
     impl SaturatingRem<NonZero<T>> for T {
         type Output = T;
@@ -93,6 +75,30 @@ for_signed_and_unsigned! {
 
                 Output::try_from(self).unwrap_or(saturation_point)
             }
+        }
+    }
+}
+
+for_signed! {
+    type T;
+
+    impl SaturatingNeg for T {
+        type Output = T;
+
+        fn saturating_neg(self) -> T {
+            self.saturating_neg()
+        }
+    }
+}
+
+for_unsigned! {
+    type T;
+
+    impl SaturatingNeg for T {
+        type Output = T;
+
+        fn saturating_neg(self) -> T {
+            0
         }
     }
 }
