@@ -120,8 +120,6 @@ for_signed_and_unsigned! {
     test!(T checked shl << u32);
     test!(T checked shr >> u32);
 
-    // TODO: Test encapsulating operations.
-
     test!(T saturating add +);
     test!(T saturating mul *);
     test!(T saturating sub -);
@@ -159,8 +157,19 @@ for_signed_and_unsigned! {
             }
         }
 
-        // TODO: Test saturating cast.
-        // TODO: Test wrapping cast.
+        #[property_test]
+        fn saturating_cast(value: T) {
+            let output = saturating!(value as U);
+
+            if output != U::MIN && output != U::MAX {
+                assert_eq!(checked!(output as T), Some(value));
+            }
+        }
+
+        #[property_test]
+        fn wrapping_cast(value: T) {
+            assert_eq!(wrapping!(value as U), value as U);
+        }
     }
 
     #[property_test]
